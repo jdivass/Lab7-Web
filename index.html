@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game!</title>
+    <style>
+        .board{
+            display: grid;
+            grid-template-columns: repeat(15,50px);
+            grid-template-rows: repeat(15,50px);
+            background-color: #18353B
+        }
+
+    </style>
+</head>
+<body style="background: #373737; display: flex; align-content: center; justify-content: center;">
+    
+    <section id="root" style="background: #373737; display: flex; flex-direction: column; align-content: center; justify-content: center;" ></section>
+
+    <!-- React & ReactDOM CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Babel-->>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+        const root = document.getElementById('root')
+        const reactRoot = ReactDOM.createRoot(root)
+
+        const Title = ({title}) => {
+        const[color, setColors] = React.useState(true)
+        if (color) {
+            return (
+                <h1 style={{ color: "#A0CC00", fontSize: "50px", textAlign: "center" }} onClick={() => setColors(false)}>{title}</h1>
+            )
+        }
+        return (
+                <h1 style={{ color: "#02887C" }} onClick={() => setColors(true)}>{title}</h1>
+        )
+        }
+        const Snake = ({x, y}) => {
+            const style_body = {
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '5px',
+                width: '50px',
+                height: '50px',
+                background: '#A0CC00',
+                boxSizing: 'border-box',
+                border: '1px solid #02887C',
+                gridColumn: x,
+                gridRow: y,
+            }
+            const style_eyes = {
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width:'15px',
+                height: '15px',
+                background: 'white',
+            }
+
+            return  <section style={style_body}>
+                    <div style={style_eyes}>■</div>
+                    <div style={style_eyes}>■</div>
+                    </section>
+        }
+
+        const Segment = ({x,y}) => {
+            const style = {
+                width: '50px',
+                height: '50px',
+                background: 'green',
+                boxSizing: 'border-box',
+                border: '1px solid green',
+                gridColumn: x,
+                gridRow: y,
+            }
+
+            React.useEffect(()=>{
+                console.log('one of the values changed')
+                console.log('x:', x)
+                console.log('y:', y)
+            }, [x, y])
+            return <div style={style} />
+        }
+
+        const Game = () => {
+            return(
+                <><Title title = {"Snake Game"} />
+                <main className="board">
+                <Snake x={5} y={8} />
+                <Snake x={6} y={8} />
+                <Snake x={7} y={8} />
+                </main>
+                </>
+            )
+        }
+        
+        reactRoot.render(<Game />)
+    </script>
+</body>
+</html>
