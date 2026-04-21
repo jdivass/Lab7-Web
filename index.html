@@ -7,7 +7,7 @@
     <style>
         .board{
             display: grid;
-            grid-template-columns: repeat(15,50px);
+            grid-template-columns: repeat(17,50px);
             grid-template-rows: repeat(15,50px);
             background-color: #18353B
         }
@@ -36,10 +36,67 @@
             )
         }
         return (
-                <h1 style={{ color: "#02887C" }} onClick={() => setColors(true)}>{title}</h1>
+                <h1 style={{ color: "#02887C", fontSize: "50px", textAlign: "center"  }} onClick={() => setColors(true)}>{title}</h1>
         )
         }
         const Snake = ({x, y}) => {
+            const [position, setPosition] = React.useState({x: x, y: y})
+            const [direction, setDirection] = React.useState('ArrowRight')
+
+            React.useEffect(() => {
+                const handleKeyDown = (event) => {
+                    switch (event.key) {
+                        case 'ArrowRight':
+                            setDirection('ArrowRight')
+                            break
+
+                        case 'ArrowLeft':
+                            setDirection('ArrowLeft')
+                            break
+
+                        case 'ArrowUp':
+                            setDirection('ArrowUp')
+                            break
+
+                        case 'ArrowDown':
+                            setDirection('ArrowDown')
+                            break
+                    }
+                }
+                    window.addEventListener("keydown", handleKeyDown)
+                    return () => {
+                        window.removeEventListener("keydown", handleKeyDown)
+                }
+            }, [])
+
+            React.useEffect(() => {
+                console.log(direction)
+                const i = setInterval(() => {
+                    setPosition((oldPosition) => {
+                        let newPosition = { x: null, y: null }
+                        switch (direction){
+                            case 'ArrowRight':
+                                newPosition = {x: oldPosition.x + 1, y: oldPosition.y}
+                                break
+
+                            case 'ArrowLeft':
+                                newPosition = {x: oldPosition.x - 1, y: oldPosition.y}
+                                break
+
+                            case 'ArrowUp':
+                                newPosition = {x: oldPosition.x, y: oldPosition.y - 1}
+                                break
+
+                            case 'ArrowDown':
+                                newPosition = {x: oldPosition.x, y: oldPosition.y + 1}
+                                break
+                        }
+                        return newPosition
+                    })
+                }, 250)
+                return () => clearInterval(i)
+            }, [direction])
+            
             const style_body = {
                 display: 'flex',
                 flexDirection: 'row',
@@ -51,8 +108,8 @@
                 background: '#A0CC00',
                 boxSizing: 'border-box',
                 border: '1px solid #02887C',
-                gridColumn: x,
-                gridRow: y,
+                gridColumn: position.x,
+                gridRow: position.y,
             }
             const style_eyes = {
                 display: 'flex',
@@ -93,8 +150,6 @@
             return(
                 <><Title title = {"Snake Game"} />
                 <main className="board">
-                <Snake x={5} y={8} />
-                <Snake x={6} y={8} />
                 <Snake x={7} y={8} />
                 </main>
                 </>
