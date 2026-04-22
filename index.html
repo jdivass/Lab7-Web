@@ -26,6 +26,7 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <script type="text/babel">
+        var points = 0
         const root = document.getElementById('root')
         const reactRoot = ReactDOM.createRoot(root)
 
@@ -45,14 +46,21 @@
         )
         }
 
-        const Board = () => {
+        const Board = ({setShow}) => {
             const [fruitPos, setFruitPos] = React.useState({x: 4, y: 5})
             const [position, setPosition] = React.useState({x: 3, y: 4})
             const [direction, setDirection] = React.useState('ArrowRight')
 
-            const Devoured = () => {
-                
+
+            const gridCollition = () => {
+                setTimeout(setShow(3), 250)
             }
+            const Devoured = () => {
+                points = points + 100
+                setFruitPos({x: getRandomInt(1,17), y: getRandomInt(1,17)})
+                console.log("Points:", points)
+            }
+
             React.useEffect(() => {
                 const handleKeyDown = (event) => {
                     switch (event.key) {
@@ -79,10 +87,7 @@
                 }
             }, [])
 
-
-
             React.useEffect(() => {
-                console.log(direction)
                 const i = setInterval(() => {
                     setPosition((oldPosition) => {
                         let newPosition = { x: null, y: null }
@@ -104,8 +109,23 @@
                                 break
                         }
                         if (newPosition.x === fruitPos.x && newPosition.y === fruitPos.y) {
-                            setFruitPos({x: 1, y: 1})
-                        
+                            Devoured()
+                        }
+
+                        if (newPosition.x > 17 && direction === 'ArrowRight'){
+                            gridCollition()
+                        }
+
+                        if (newPosition.x < 1 && direction === 'ArrowLeft'){
+                            gridCollition()
+                        }
+
+                        if (newPosition.y > 15 && direction === 'ArrowDown'){
+                            gridCollition()
+                        }
+
+                        if (newPosition.y < 0 && direction === 'ArrowUp'){
+                            gridCollition()
                         }
                         return newPosition
                     })
@@ -184,8 +204,43 @@
                 </section> )
         }
 
+        const GameOver = ({setShow}) => {
+            const style = {
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '500px',
+                width: '500px',
+                background: '#A0CC00',
+                border: '1px solid #18353B'
+            }
+            
+            const font_style = {
+                color: 'black',
+                fontSize: '20px'
+            }
+
+            const button_style = {
+                height: '20px',
+                width: '20px',
+                background: '#02887C',
+                border: '1px solid #373737'
+            }
+
+            const button_font_style = {
+                fontSize: '20px',
+                color: 'white'
+            }
+
+                return (<section style={style}>
+                <h2>Game Over! 🐍</h2>    
+                <p style={font_style}>Dont worry! You can always try again!</p>
+                <button onClick={() => setShow(2)}>Try Again</button>
+                </section> )
+        }
+
         const Fruit = ({x, y}) => {
-            console.log(x, y)
             const style = {
                 gridColumn: x,
                 gridRow: y,
@@ -195,10 +250,23 @@
         }
         const Game = () => {
             const [show, setShow] = React.useState(1)
+            let screen
+            switch (show){
+                case 1:
+                    screen = <Start setShow = {setShow} />
+                    break
+                case 2:
+                    screen = <Board setShow = {setShow}/>
+                    break
+                case 3:
+                    screen = <GameOver setShow = {setShow}/>
+                    break
+                
+            }
             return(
                 <>
                 <Title title = "Snake Game"/>
-                {show === 1 ? <Start setShow = {setShow} /> : <Board /> }
+                {screen}
                 </>
             )
         }
