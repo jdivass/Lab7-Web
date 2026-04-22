@@ -21,12 +21,17 @@
     <!-- React & ReactDOM CDN -->
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
     <!-- Babel-->>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <script type="text/babel">
         const root = document.getElementById('root')
         const reactRoot = ReactDOM.createRoot(root)
+
+        const getRandomInt = (min, max) => {
+            return Math.floor(Math.random() * (max - min + 1) + min);
+        }
 
         const Title = ({title}) => {
         const[color, setColors] = React.useState(true)
@@ -74,7 +79,7 @@
                 const i = setInterval(() => {
                     setPosition((oldPosition) => {
                         let newPosition = { x: null, y: null }
-                        switch (direction){
+                        switch (direction) {
                             case 'ArrowRight':
                                 newPosition = {x: oldPosition.x + 1, y: oldPosition.y}
                                 break
@@ -127,35 +132,56 @@
                     </section>
         }
 
-        const Segment = ({x,y}) => {
+        const Start_Button = () => {
+            const [redirect, setRedirect] = React.useState(false)
             const style = {
-                width: '50px',
-                height: '50px',
-                background: 'green',
-                boxSizing: 'border-box',
-                border: '1px solid green',
-                gridColumn: x,
-                gridRow: y,
+                background: '#02887C',
+                border: '1px solid #373737'
             }
-
-            React.useEffect(()=>{
-                console.log('one of the values changed')
-                console.log('x:', x)
-                console.log('y:', y)
-            }, [x, y])
-            return <div style={style} />
         }
 
+        const Start = () => {
+            const [show, showState] = React.useState(true)
+            const style = {
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '200px',
+                width: '200px',
+                background: '#A0CC00',
+            }
+
+            return <section style={style}>
+                <h2>Snake 🐍</h2>    
+                <p>Welcome to the classic Snake Game! Press sssstart to play!</p>
+                
+                </section>
+        }
+        const Fruit = ({x, y}) => {
+            const [position, setPosition] = React.useState({x: x, y: y})
+
+            
+            const style = {
+                gridColumn: position.x,
+                gridRow: position.y,
+            }
+            
+            return <div style={style}> <img src="./Fruit.png" width="50px" height="50px"/> </div>
+        }
         const Game = () => {
             return(
-                <><Title title = {"Snake Game"} />
+                <>
+
+                <Title title = "Snake Game" />
                 <main className="board">
-                <Snake x={7} y={8} />
+                <Fruit x={6} y={7} />
+                <Snake x={8} y={10} />
                 </main>
+
                 </>
             )
         }
-        
         reactRoot.render(<Game />)
     </script>
 </body>
