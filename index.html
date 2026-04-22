@@ -22,11 +22,10 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 
-    <!-- Babel-->>
+    <!-- Babel-->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <script type="text/babel">
-        var points = 0
         const root = document.getElementById('root')
         const reactRoot = ReactDOM.createRoot(root)
 
@@ -45,20 +44,31 @@
                 <h1 style={{ color: "#02887C", fontSize: "50px", textAlign: "center"  }} onClick={() => setColors(true)}>{title}</h1>
         )
         }
+        const Points = ({points}) => {
+            const style = {
+                height: 'fit-content',
+                width: 'fit-content',
+                background: '#02887C',
+                color: 'white',
+            }
+
+            return <span style={style}>Points: {points} </span>
+        }
 
         const Board = ({setShow}) => {
+            const [points, setPoints] = React.useState(0)
             const [fruitPos, setFruitPos] = React.useState({x: 4, y: 5})
             const [position, setPosition] = React.useState({x: 3, y: 4})
             const [direction, setDirection] = React.useState('ArrowRight')
 
 
             const gridCollition = () => {
-                setTimeout(setShow(3), 250)
+                setTimeout(() => setShow(3), 250)
             }
             const Devoured = () => {
-                points = points + 100
+                setPoints(oldPoints => oldPoints + 100)
+                
                 setFruitPos({x: getRandomInt(1,17), y: getRandomInt(1,17)})
-                console.log("Points:", points)
             }
 
             React.useEffect(() => {
@@ -124,7 +134,7 @@
                             gridCollition()
                         }
 
-                        if (newPosition.y < 0 && direction === 'ArrowUp'){
+                        if (newPosition.y < 1 && direction === 'ArrowUp'){
                             gridCollition()
                         }
                         return newPosition
@@ -133,7 +143,7 @@
                 return () => clearInterval(i)
             }, [direction, fruitPos])
 
-            return (<main className="board"> <Fruit x={fruitPos.x} y={fruitPos.y} /> <Snake x={position.x} y={position.y} /> </main>)
+            return (<><Points points={points}/><main className="board"> <Fruit x={fruitPos.x} y={fruitPos.y} /> <Snake x={position.x} y={position.y} /> </main></>)
 
         }
         const Snake = ({x, y}) => {
