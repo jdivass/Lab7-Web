@@ -56,7 +56,7 @@
         )
         }
 
-        const Points = ({points}) => {
+        const Score = ({score}) => {
             const style = {
                 display: 'flex',
                 alignItems: 'center',
@@ -81,7 +81,7 @@
             return (
                 <div style={style}>
                     <span style={emoji_style}>🍎</span>
-                    <span>SCORE: {String(points).padStart(6, '0')}</span>
+                    <span>SCORE: {String(score).padStart(6, '0')}</span>
                     <span style={emoji_style}>🍎</span>
                 </div>
             )
@@ -108,7 +108,7 @@
 
         const Board = ({setShow}) => {
             
-            const [points, setPoints] = React.useState(0)
+            const [score, setScore] = React.useState(0)
             const [fruitPos, setFruitPos] = React.useState({x: 8, y: 10})
             const [position, setPosition] = React.useState({x: 3, y: 4})
             const [body, setBody] = React.useState([{x: 2, y: 4}, {x: 1, y: 4}])
@@ -119,7 +119,7 @@
                 setTimeout(() => setShow(3), 250)
             }
             const Devoured = () => {
-                setPoints(oldPoints => oldPoints + 100)
+                setScore(oldScore => oldScore + 100)
                 
                 setBody((oldBody)=>{
                     if (oldBody.length ===0){
@@ -163,6 +163,7 @@
             }, [])
 
             React.useEffect(() => {
+                const speed = Math.max(80, 250 - body.length * 10)
                 const i = setInterval(() => {
                     setPosition((oldPosition) => {
                         const oldHead = {...oldPosition}
@@ -218,13 +219,13 @@
                         })
                         return newPosition
                     })
-                }, 250)
+                }, speed)
                 return () => clearInterval(i)
-            }, [direction, fruitPos])
+            }, [direction, fruitPos, body.length])
 
             return (
                 <>
-                    <Points points={points}/>
+                    <Score score={score}/>
                     <main className="board" style={{
                         border: '50px solid #18353B',
                         borderRadius: '30px',
