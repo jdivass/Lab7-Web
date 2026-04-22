@@ -44,10 +44,15 @@
                 <h1 style={{ color: "#02887C", fontSize: "50px", textAlign: "center"  }} onClick={() => setColors(true)}>{title}</h1>
         )
         }
-        const Snake = ({x, y}) => {
-            const [position, setPosition] = React.useState({x: x, y: y})
+
+        const Board = () => {
+            const [fruitPos, setFruitPos] = React.useState({x: 4, y: 5})
+            const [position, setPosition] = React.useState({x: 3, y: 4})
             const [direction, setDirection] = React.useState('ArrowRight')
 
+            const Devoured = () => {
+                
+            }
             React.useEffect(() => {
                 const handleKeyDown = (event) => {
                     switch (event.key) {
@@ -74,6 +79,8 @@
                 }
             }, [])
 
+
+
             React.useEffect(() => {
                 console.log(direction)
                 const i = setInterval(() => {
@@ -96,11 +103,20 @@
                                 newPosition = {x: oldPosition.x, y: oldPosition.y + 1}
                                 break
                         }
+                        if (newPosition.x === fruitPos.x && newPosition.y === fruitPos.y) {
+                            setFruitPos({x: 1, y: 1})
+                        
+                        }
                         return newPosition
                     })
                 }, 250)
                 return () => clearInterval(i)
-            }, [direction])
+            }, [direction, fruitPos])
+
+            return (<main className="board"> <Fruit x={fruitPos.x} y={fruitPos.y} /> <Snake x={position.x} y={position.y} /> </main>)
+
+        }
+        const Snake = ({x, y}) => {
             
             const style_body = {
                 display: 'flex',
@@ -113,8 +129,8 @@
                 background: '#A0CC00',
                 boxSizing: 'border-box',
                 border: '1px solid #02887C',
-                gridColumn: position.x,
-                gridRow: position.y,
+                gridColumn: x,
+                gridRow: y,
             }
             const style_eyes = {
                 display: 'flex',
@@ -132,53 +148,57 @@
                     </section>
         }
 
-        const Start_Button = () => {
-            const [redirect, setRedirect] = React.useState(false)
+        const Start = ({setShow}) => {
             const style = {
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '500px',
+                width: '500px',
+                background: '#A0CC00',
+                border: '1px solid #18353B'
+            }
+            
+            const font_style = {
+                color: 'black',
+                fontSize: '20px'
+            }
+
+            const button_style = {
+                height: '20px',
+                width: '20px',
                 background: '#02887C',
                 border: '1px solid #373737'
             }
-        }
 
-        const Start = () => {
-            const [show, showState] = React.useState(true)
-            const style = {
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                height: '200px',
-                width: '200px',
-                background: '#A0CC00',
+            const button_font_style = {
+                fontSize: '20px',
+                color: 'white'
             }
 
-            return <section style={style}>
+                return (<section style={style}>
                 <h2>Snake 🐍</h2>    
-                <p>Welcome to the classic Snake Game! Press sssstart to play!</p>
-                
-                </section>
+                <p style={font_style}>Welcome to the classic Snake Game! Press sssstart to play!</p>
+                <button onClick={() => setShow(2)}>Start</button>
+                </section> )
         }
-        const Fruit = ({x, y}) => {
-            const [position, setPosition] = React.useState({x: x, y: y})
 
-            
+        const Fruit = ({x, y}) => {
+            console.log(x, y)
             const style = {
-                gridColumn: position.x,
-                gridRow: position.y,
+                gridColumn: x,
+                gridRow: y,
             }
             
             return <div style={style}> <img src="./Fruit.png" width="50px" height="50px"/> </div>
         }
         const Game = () => {
+            const [show, setShow] = React.useState(1)
             return(
                 <>
-
-                <Title title = "Snake Game" />
-                <main className="board">
-                <Fruit x={6} y={7} />
-                <Snake x={8} y={10} />
-                </main>
-
+                <Title title = "Snake Game"/>
+                {show === 1 ? <Start setShow = {setShow} /> : <Board /> }
                 </>
             )
         }
