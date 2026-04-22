@@ -5,18 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Snake Game!</title>
     <style>
-        .board{
+        .board {
             display: grid;
-            grid-template-columns: repeat(17,50px);
-            grid-template-rows: repeat(15,50px);
-            background-color: #18353B
+            grid-template-columns: repeat(17, 150px);
+            grid-template-rows: repeat(15, 150px);
+            background-color: #18353B;
+            width: fit-content;
+            height: fit-content;
         }
-
+        #root{
+            background: #373737;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            align-content: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
     </style>
 </head>
-<body style="background: #373737; display: flex; align-content: center; justify-content: center;">
+<body style=" display: flex; flex-direction: column; align-content: center; justify-content: center; background-color: #373737;">
     
-    <section id="root" style="background: #373737; display: flex; flex-direction: column; align-content: center; justify-content: center;" ></section>
+    <section id="root"></section>
 
     <!-- React & ReactDOM CDN -->
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
@@ -37,28 +48,70 @@
         const[color, setColors] = React.useState(true)
         if (color) {
             return (
-                <h1 style={{ color: "#A0CC00", fontSize: "50px", textAlign: "center" }} onClick={() => setColors(false)}>{title}</h1>
+                <h1 style={{ color: "#A0CC00", fontSize: "400px", textAlign: "center", margin: '20px'}} onClick={() => setColors(false)}>{title}</h1>
             )
         }
         return (
-                <h1 style={{ color: "#02887C", fontSize: "50px", textAlign: "center"  }} onClick={() => setColors(true)}>{title}</h1>
+                <h1 style={{ color: "#02887C", fontSize: "400px", textAlign: "center"  }} onClick={() => setColors(true)}>{title}</h1>
         )
         }
+
         const Points = ({points}) => {
             const style = {
-                height: 'fit-content',
-                width: 'fit-content',
-                background: '#02887C',
-                color: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                background: '#18353B',
+                color: '#A0CC00',
+                fontSize: '150px',
+                fontWeight: 'bold',
+                fontFamily: 'monospace',
+                padding: '10px 30px',
+                borderRadius: '20px',
+                marginBottom: '15px',
+                border: '3px solid #02887C',
+                letterSpacing: '2px'
             }
 
-            return <span style={style}>Points: {points} </span>
+            const emoji_style = {
+                fontSize: '150px'
+            }
+
+            return (
+                <div style={style}>
+                    <span style={emoji_style}>🍎</span>
+                    <span>SCORE: {String(points).padStart(6, '0')}</span>
+                    <span style={emoji_style}>🍎</span>
+                </div>
+            )
+        }
+
+        const Body = ({x, y}) => {
+            const style = {
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '5px',
+                width: '150px',
+                height: '150px',
+                background: '#A0CC00',
+                boxSizing: 'border-box',
+                border: '1px solid #02887C',
+                gridColumn: x,
+                gridRow: y,
+            }
+
+            return <section style={style} />
         }
 
         const Board = ({setShow}) => {
+            
             const [points, setPoints] = React.useState(0)
-            const [fruitPos, setFruitPos] = React.useState({x: 4, y: 5})
+            const [fruitPos, setFruitPos] = React.useState({x: 8, y: 10})
             const [position, setPosition] = React.useState({x: 3, y: 4})
+            const [body, setBody] = React.useState([{x: 2, y: 4}, {x: 1, y: 4}])
             const [direction, setDirection] = React.useState('ArrowRight')
 
 
@@ -68,8 +121,20 @@
             const Devoured = () => {
                 setPoints(oldPoints => oldPoints + 100)
                 
-                setFruitPos({x: getRandomInt(1,17), y: getRandomInt(1,17)})
-            }
+                setBody((oldBody)=>{
+                    if (oldBody.length ===0){
+                        return [
+                            {x: position.x, y: position.y}
+                        ]
+                    }
+
+                    return [
+                        ...oldBody, {...oldBody[oldBody.length -1]}
+                    ]
+                })
+
+                setFruitPos({x: getRandomInt(1,16), y: getRandomInt(1,14)})
+            }   
 
             React.useEffect(() => {
                 const handleKeyDown = (event) => {
@@ -100,7 +165,8 @@
             React.useEffect(() => {
                 const i = setInterval(() => {
                     setPosition((oldPosition) => {
-                        let newPosition = { x: null, y: null }
+                        const oldHead = {...oldPosition}
+                        let newPosition = { ...oldPosition}
                         switch (direction) {
                             case 'ArrowRight':
                                 newPosition = {x: oldPosition.x + 1, y: oldPosition.y}
@@ -118,32 +184,62 @@
                                 newPosition = {x: oldPosition.x, y: oldPosition.y + 1}
                                 break
                         }
+
+                        if (
+                            newPosition.x < 1 ||
+                            newPosition.x > 17 ||
+                            newPosition.y < 1 ||
+                            newPosition.y > 15
+                        ) {
+                            gridCollition()
+                            return oldPosition
+                        }
                         if (newPosition.x === fruitPos.x && newPosition.y === fruitPos.y) {
                             Devoured()
                         }
+                        
+                        setBody((oldBody) => {
+                            const hitBody = oldBody.some(
+                                (segment) => segment.x === newPosition.x && segment.y === newPosition.y
+                            )
+                            if (hitBody) {
+                                gridCollition()
+                                return oldBody
+                            }
 
-                        if (newPosition.x > 17 && direction === 'ArrowRight'){
-                            gridCollition()
-                        }
-
-                        if (newPosition.x < 1 && direction === 'ArrowLeft'){
-                            gridCollition()
-                        }
-
-                        if (newPosition.y > 15 && direction === 'ArrowDown'){
-                            gridCollition()
-                        }
-
-                        if (newPosition.y < 1 && direction === 'ArrowUp'){
-                            gridCollition()
-                        }
+                            const newBody = [...oldBody]
+                            for (let i = newBody.length - 1; i > 0; i--) {
+                                newBody[i] = { ...newBody[i - 1] }
+                            }
+                            if (newBody.length > 0) {
+                                newBody[0] = oldHead
+                            }
+                            return newBody
+                        })
                         return newPosition
                     })
                 }, 250)
                 return () => clearInterval(i)
             }, [direction, fruitPos])
 
-            return (<><Points points={points}/><main className="board"> <Fruit x={fruitPos.x} y={fruitPos.y} /> <Snake x={position.x} y={position.y} /> </main></>)
+            return (
+                <>
+                    <Points points={points}/>
+                    <main className="board" style={{
+                        border: '50px solid #18353B',
+                        borderRadius: '30px',
+                        overflow: 'hidden'
+                    }}>
+                        <Fruit x={fruitPos.x} y={fruitPos.y} />
+                        <Snake x={position.x} y={position.y} />
+                        {
+                            body.map((segment, index) => {
+                                return <Body key={index} x={segment.x} y={segment.y} />
+                            })
+                        }
+                    </main>
+                </>
+            )
 
         }
         const Snake = ({x, y}) => {
@@ -154,8 +250,8 @@
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '5px',
-                width: '50px',
-                height: '50px',
+                width: '150px',
+                height: '150px',
                 background: '#A0CC00',
                 boxSizing: 'border-box',
                 border: '1px solid #02887C',
@@ -167,8 +263,8 @@
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'center',
-                width:'15px',
-                height: '15px',
+                width:'50px',
+                height: '50px',
                 background: 'white',
             }
 
@@ -184,33 +280,47 @@
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                height: '500px',
-                width: '500px',
+                height: '75%',
+                width: '75%',
+                padding:'2%',
                 background: '#A0CC00',
-                border: '1px solid #18353B'
+                border: '50px solid #18353B',
+                borderRadius: '30px'
             }
             
             const font_style = {
                 color: 'black',
-                fontSize: '20px'
+                fontSize: '150px',
+                textAlign: 'center'
             }
 
             const button_style = {
-                height: '20px',
-                width: '20px',
+                height: 'fit-content',
+                width: 'fit-content',
+                padding: '20px',
                 background: '#02887C',
-                border: '1px solid #373737'
+                border: '1px solid #373737',
+                color: 'white',
+                padding: '1%',
+                fontSize: '200px',
+                borderRadius: '80px'
             }
 
-            const button_font_style = {
-                fontSize: '20px',
-                color: 'white'
-            }
 
                 return (<section style={style}>
-                <h2>Snake 🐍</h2>    
-                <p style={font_style}>Welcome to the classic Snake Game! Press sssstart to play!</p>
-                <button onClick={() => setShow(2)}>Start</button>
+                <p style={font_style}>Welcome to the classic Snake Game! <br />
+                    1. Press <b>Start</b> to begin the game. <br />
+
+                    2. Use the <b>arrow keys</b> (<b>↑ ↓ ← →</b>) to move the snake. <br />
+
+                    3. Eat the fruits to earn points and make the snake grow longer.<br />
+
+                    4. Avoid hitting the edges of the board. <br />
+
+                    5. If you lose, the <b>Game Over</b> screen will appear and you can press <b>Try Again</b> to play once more. <br />
+
+                    Press sssstart to play!</p>
+                <button onClick={() => setShow(2)} style={button_style}>Start</button>
                 </section> )
         }
 
@@ -220,43 +330,51 @@
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                height: '500px',
-                width: '500px',
+                height: '75%',
+                width: '75%',
+                padding: '2%',
                 background: '#A0CC00',
-                border: '1px solid #18353B'
+                border: '50px solid #18353B',
+                borderRadius: '30px'
             }
-            
+
             const font_style = {
                 color: 'black',
-                fontSize: '20px'
+                fontSize: '150px',
+                textAlign: 'center'
             }
 
             const button_style = {
-                height: '20px',
-                width: '20px',
+                height: 'fit-content',
+                width: 'fit-content',
                 background: '#02887C',
-                border: '1px solid #373737'
+                border: '1px solid #373737',
+                color: 'white',
+                padding: '1%',
+                fontSize: '200px',
+                borderRadius: '80px'
             }
 
-            const button_font_style = {
-                fontSize: '20px',
-                color: 'white'
-            }
-
-                return (<section style={style}>
-                <h2>Game Over! 🐍</h2>    
-                <p style={font_style}>Dont worry! You can always try again!</p>
-                <button onClick={() => setShow(2)}>Try Again</button>
-                </section> )
+            return (
+                <section style={style}>
+                    <p style={font_style}>
+                        Game Over! 🐍 <br />
+                        Don't worry, you can always try again!
+                    </p>
+                    <button onClick={() => setShow(2)} style={button_style}>Try Again</button>
+                </section>
+            )
         }
 
         const Fruit = ({x, y}) => {
             const style = {
+                height: '150px',
+                width: '150px',
                 gridColumn: x,
                 gridRow: y,
             }
             
-            return <div style={style}> <img src="./Fruit.png" width="50px" height="50px"/> </div>
+            return <div style={style}> <img src="./Fruit.png" width="100%" height="100%"/> </div>
         }
         const Game = () => {
             const [show, setShow] = React.useState(1)
@@ -275,7 +393,7 @@
             }
             return(
                 <>
-                <Title title = "Snake Game"/>
+                <Title title = "Snake 🐍"/>
                 {screen}
                 </>
             )
